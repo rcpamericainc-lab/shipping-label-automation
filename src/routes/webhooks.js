@@ -10,6 +10,18 @@ export const webhooksRouter = express.Router();
 // (wired up in server.js) rather than the global JSON parser.
 webhooksRouter.post("/orders/create", async (req, res) => {
   const hmac = req.get("X-Shopify-Hmac-Sha256");
+
+  // TEMPORARY debug logging -- remove once webhook verification is confirmed
+  // working. Never logs the secret or the HMAC values themselves.
+  console.log("[webhook debug]", {
+    isBuffer: Buffer.isBuffer(req.body),
+    bodyType: typeof req.body,
+    bodyLength: Buffer.isBuffer(req.body) ? req.body.length : undefined,
+    hasHmacHeader: Boolean(hmac),
+    hasSecretConfigured: Boolean(process.env.SHOPIFY_API_SECRET),
+    contentType: req.get("Content-Type"),
+  });
+
   const valid = verifyShopifyWebhook(req.body, hmac, process.env.SHOPIFY_API_SECRET);
 
   if (!valid) {
