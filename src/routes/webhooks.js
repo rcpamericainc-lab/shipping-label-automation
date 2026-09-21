@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import express from "express";
 import { verifyShopifyWebhook } from "../lib/verifyShopifyWebhook.js";
 import { createShipment } from "../lib/fedex.js";
@@ -12,13 +13,27 @@ webhooksRouter.post("/orders/create", async (req, res) => {
   const hmac = req.get("X-Shopify-Hmac-Sha256");
 
   // TEMPORARY debug logging -- remove once webhook verification is confirmed
-  // working. Never logs the secret or the HMAC values themselves.
+  // working. Logs lengths/prefixes only, never the secret or full HMAC values.
+  const computedDigest = Buffer.isBuffer(req.body)
+    ? crypto
+        .createHmac("sha256", process.env.SHOPIFY_API_SECRET || "")
+        .update(req.body)
+        .digest("base64")
+    : null;
   console.log("[webhook debug]", {
     isBuffer: Buffer.isBuffer(req.body),
     bodyType: typeof req.body,
     bodyLength: Buffer.isBuffer(req.body) ? req.body.length : undefined,
+    bodyFirst20: Buffer.isBuffer(req.body) ? req.body.toString("utf8", 0, 20) : undefined,
+    bodyLast20: Buffer.isBuffer(req.body)
+      ? req.body.toString("utf8", Math.max(0, req.body.length - 20))
+      : undefined,
     hasHmacHeader: Boolean(hmac),
+    hmacHeaderLength: hmac ? hmac.length : 0,
+    computedDigestLength: computedDigest ? computedDigest.length : 0,
+    digestsMatch: computedDigest === hmac,
     hasSecretConfigured: Boolean(process.env.SHOPIFY_API_SECRET),
+    secretLength: (process.env.SHOPIFY_API_SECRET || "").length,
     contentType: req.get("Content-Type"),
   });
 
