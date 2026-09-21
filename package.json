@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "Shopify order webhook -> FedEx Ship API label -> tracking write-back -> print to warehouse D450BT via PrintNode",
   "type": "module",
-  "main": "src/dev-server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/dev-server.js",
-    "dev": "node --watch src/dev-server.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
     "test-print": "node src/scripts/test-print.js",
     "test-fedex": "node src/scripts/test-fedex.js"
   },
