@@ -6,8 +6,8 @@ See the project doc for full context: `13-projects/active/shipping-label-automat
 
 ## What's built here
 
-- `src/app.js` — the Express app (routes mounted), used by both entry points below.
-- `src/dev-server.js` — local/dev entry point only (calls `app.listen()`). Deliberately not named `server.js` -- Vercel auto-detects any `src/server.js` as a special zero-config Node server entrypoint, which collided with the `api/index.js` serverless function below.
+- `src/expressApp.js` — the Express app (routes mounted), used by both entry points below. Deliberately not named `app.js`/`server.js` -- Vercel's zero-config detection treats those filenames as special framework entrypoints, which collided with the explicit `api/index.js` function below and crashed production with "Invalid export found in module".
+- `src/dev-server.js` — local/dev entry point only (calls `app.listen()`).
 - `api/index.js` — the actual Vercel serverless entry point.
 - `src/routes/webhooks.js` — `POST /webhooks/orders/create`. Verifies the Shopify HMAC signature, then runs FedEx → Shopify → PrintNode.
 - `src/lib/fedex.js` — OAuth2 + shipment/label creation against the FedEx Ship API.

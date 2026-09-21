@@ -1,7 +1,7 @@
 // Local/dev entry point only -- a persistent process that listens on a port.
 // Vercel doesn't use this file; see api/index.js for the serverless entry.
 import "dotenv/config";
-import { app } from "./app.js";
+import { app } from "./expressApp.js";
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
