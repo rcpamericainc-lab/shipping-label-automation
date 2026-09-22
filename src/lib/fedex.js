@@ -82,10 +82,12 @@ function buildRequestedShipment(order) {
       },
     },
     labelSpecification: {
-      // TODO: confirm the D450BT's supported format (ZPL is common for thermal
-      // printers). If it needs ZPL, change imageType to "ZPLII" here.
+      // PAPER_4X6 produces a Letter-sized (612x792pt) PDF with the label
+      // embedded at ~1/4 size -- PAPER_* stock types target laser/sheet
+      // printers. STOCK_4X6 (confirmed via sandbox test) produces a real
+      // 288x432pt (4x6in) page, matching the D450BT's physical label stock.
       imageType: "PDF",
-      labelStockType: "PAPER_4X6",
+      labelStockType: "STOCK_4X6",
     },
     requestedPackageLineItems: [
       {
