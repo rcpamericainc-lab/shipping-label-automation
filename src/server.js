@@ -1,9 +1,19 @@
-// Entry point for both local dev and Vercel. Vercel auto-detects src/server.js
-// as a Node.js server entrypoint (via its app.listen() call) and captures the
-// whole thing as one Vercel Function -- no api/ directory or vercel.json
-// rewrites needed. Locally this is just a normal persistent Node process.
+// The one entry point, used both locally and on Vercel. Vercel's Express
+// zero-config detection specifically requires the entrypoint file itself to
+// import "express" directly (static analysis, not just app.listen()) -- an
+// earlier version that imported the app from a separate module failed with
+// "No entrypoint found which imports express".
 import "dotenv/config";
-import { app } from "./expressApp.js";
+import express from "express";
+import { webhooksRouter } from "./routes/webhooks.js";
+
+const app = express();
+
+// Webhook routes need the raw body for HMAC verification, so mount them with
+// express.raw() before any global JSON body parser touches the request.
+app.use("/webhooks", express.raw({ type: "application/json" }), webhooksRouter);
+
+app.get("/health", (req, res) => res.send("ok"));
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
