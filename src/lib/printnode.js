@@ -17,6 +17,13 @@ export async function printLabel(labelBase64, contentType) {
       contentType: contentType === "application/pdf" ? "pdf_base64" : "raw_base64",
       content: labelBase64,
       source: "shipping-label-automation",
+      options: {
+        // The FedEx label PDF is already sized as a real 4x6" page
+        // (labelStockType: "PAPER_4X6" in fedex.js). Without fitToPage:false,
+        // PrintNode scales it to fit a default (larger) page size, which is
+        // why labels were printing at roughly 1/4 size on the 4x6 stock.
+        fitToPage: false,
+      },
     }),
   });
 
