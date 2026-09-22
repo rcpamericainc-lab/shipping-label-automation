@@ -99,6 +99,18 @@ function buildRequestedShipment(order) {
 
 export async function createShipment(order) {
   const token = await getAccessToken();
+  const requestedShipment = buildRequestedShipment(order);
+
+  // TEMPORARY debug logging -- remove once the shipper/recipient address
+  // fields are confirmed correct in production.
+  console.log("[fedex debug]", {
+    shipperCity: requestedShipment.shipper.address.city,
+    shipperState: requestedShipment.shipper.address.stateOrProvinceCode,
+    shipperCountry: requestedShipment.shipper.address.countryCode,
+    recipientCity: requestedShipment.recipients[0].address.city,
+    recipientState: requestedShipment.recipients[0].address.stateOrProvinceCode,
+    recipientCountry: requestedShipment.recipients[0].address.countryCode,
+  });
 
   const res = await fetch(`${process.env.FEDEX_API_BASE}/ship/v1/shipments`, {
     method: "POST",
@@ -112,7 +124,7 @@ export async function createShipment(order) {
       // straight to PrintNode) -- "URL_ONLY" returns a link instead, which
       // left encodedLabel undefined.
       labelResponseOptions: "LABEL",
-      requestedShipment: buildRequestedShipment(order),
+      requestedShipment,
       accountNumber: { value: process.env.FEDEX_ACCOUNT_NUMBER },
     }),
   });
